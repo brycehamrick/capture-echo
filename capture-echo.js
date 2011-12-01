@@ -82,8 +82,8 @@ var CAPTURE = {
       if (CAPTURE.ECHO.options.sso_check != null || CAPTURE.ECHO.options.sso_server != null) {
         CAPTURE.ECHO.options.sso_check = (CAPTURE.ECHO.options.sso_check != null)
           ? CAPTURE.ECHO.options.sso_check
-          : CAPTURE.ECHO.currentUrl + "?sso=check&sso_server=" + CAPTURE.ECHO.options.sso_server;
-        jQuery("body").append("<iframe>", {
+          : CAPTURE.ECHO.currentUrl + "?sso=check;
+        jQuery("body").append(jQuery("<iframe>", {
           css: {
             height: 0,
             width: 0,
@@ -91,7 +91,7 @@ var CAPTURE = {
           },
           id: "ssoCheck",
           src: CAPTURE.ECHO.options.sso_check
-        });
+        }));
       }
 
       CAPTURE.ECHO.options.captureUrl = "https://" + CAPTURE.ECHO.options.capture_addr
