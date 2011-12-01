@@ -58,8 +58,12 @@ var CAPTURE = {
     },
     
     ssoCheck: function() {
-      jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", this.ssoCheck_callback);
+      jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", this.ssoCheckBP);
     },
+
+    ssoCheckBP: function() {
+      jQuery.getScript("http://cdn.echoenabled.com/clientapps/v2/backplane.js", this.ssoCheck_callback);
+    }
 
     ssoCheck_callback: function() {
       CAPTURE.ECHO.setOptions();
