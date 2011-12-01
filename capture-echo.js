@@ -62,7 +62,7 @@ var CAPTURE = {
     },
 
     ssoCheck_callback: function() {
-      this.setOptions();
+      CAPTURE.ECHO.setOptions();
       JANRAIN.SSO.CAPTURE.check_login({
           sso_server: "https://" + CAPTURE.ECHO.options.sso_server,
           client_id: CAPTURE.ECHO.options.capture_client_id,
@@ -78,7 +78,7 @@ var CAPTURE = {
     },
 
     mainInit: function() {
-      this.setOptions();
+      CAPTURE.ECHO.setOptions();
       if (CAPTURE.ECHO.options.sso_check != null || CAPTURE.ECHO.options.sso_server != null) {
         CAPTURE.ECHO.options.sso_check = (CAPTURE.ECHO.options.sso_check != null)
           ? CAPTURE.ECHO.options.sso_check
