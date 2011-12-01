@@ -22,6 +22,18 @@ var CAPTURE = {
       "http://cdn.echoenabled.com/clientapps/v2/plugins/janrain-sharing.js"
     ],
 
+    setOptions: function() {
+      CAPTURE.ECHO.options = jQuery.extend(CAPTURE.ECHO.defaults, CAPTURE.ECHO.options);
+
+      CAPTURE.ECHO.currentUrl = window.location.href;
+      CAPTURE.ECHO.currentUrl = CAPTURE.ECHO.currentUrl.replace(/\#.+/, '').replace(/\?.+/, '');
+
+      CAPTURE.ECHO.options.xd_receiver = (CAPTURE.ECHO.options.xd_receiver === null)
+        ? CAPTURE.ECHO.currentUrl + "?xdcomm=true"
+        : CAPTURE.ECHO.options.xd_receiver;
+      CAPTURE.ECHO.options.xd_receiver = encodeURIComponent(CAPTURE.ECHO.options.xd_receiver);
+    },
+
     init: function(options) {
       this.options = options;
       if (this.gup("xdcomm") == "true") {
@@ -93,18 +105,6 @@ var CAPTURE = {
       });
 
       jQuery(".ecComments").each(CAPTURE.ECHO.comments);
-    },
-
-    setOptions: function() {
-      CAPTURE.ECHO.options = jQuery.extend(CAPTURE.ECHO.defaults, CAPTURE.ECHO.options);
-
-      CAPTURE.ECHO.currentUrl = window.location.href;
-      CAPTURE.ECHO.currentUrl = CAPTURE.ECHO.currentUrl.replace(/\#.+/, '').replace(/\?.+/, '');
-
-      CAPTURE.ECHO.options.xd_receiver = (CAPTURE.ECHO.options.xd_receiver === null)
-        ? CAPTURE.ECHO.currentUrl + "?xdcomm=true"
-        : CAPTURE.ECHO.options.xd_receiver;
-      CAPTURE.ECHO.options.xd_receiver = encodeURIComponent(CAPTURE.ECHO.options.xd_receiver);
     },
 
     comments: function(index, elem) {
