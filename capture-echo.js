@@ -31,7 +31,6 @@ var CAPTURE = {
       CAPTURE.ECHO.options.xd_receiver = (CAPTURE.ECHO.options.xd_receiver === null)
         ? CAPTURE.ECHO.currentUrl + "?xdcomm=true"
         : CAPTURE.ECHO.options.xd_receiver;
-      CAPTURE.ECHO.options.xd_receiver = encodeURIComponent(CAPTURE.ECHO.options.xd_receiver);
     },
 
     init: function(options) {
@@ -58,11 +57,8 @@ var CAPTURE = {
     },
     
     ssoCheck: function() {
-      jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", this.ssoCheckBP);
-    },
-
-    ssoCheckBP: function() {
-      jQuery.getScript("http://cdn.echoenabled.com/clientapps/v2/backplane.js", this.ssoCheck_callback);
+      CAPTURE.ECHO.bpChannel = decodeURIComponent(this.gup("bp_channel"));
+      jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", CAPTURE.ECHO.ssoCheck_callback);
     },
 
     ssoCheck_callback: function() {
@@ -72,7 +68,7 @@ var CAPTURE = {
           client_id: CAPTURE.ECHO.options.capture_client_id,
           redirect_uri: CAPTURE.ECHO.options.xd_receiver + "#parent;CAPTURE.ECHO.bpExpect:",
           xd_receiver: CAPTURE.ECHO.options.xd_receiver,
-          bp_channel: Backplane.getChannelID()
+          bp_channel: CAPTURE.ECHO.bpChannel
       });
     },
 
@@ -83,10 +79,21 @@ var CAPTURE = {
 
     mainInit: function() {
       CAPTURE.ECHO.setOptions();
+
+      CAPTURE.ECHO.options.captureUrl = "https://" + CAPTURE.ECHO.options.capture_addr
+        + "/oauth/signin?response_type=code&flags=stay_in_window&client_id="
+        + CAPTURE.ECHO.options.capture_client_id + "&xd_receiver=" + encodeURIComponent(CAPTURE.ECHO.options.xd_receiver)
+        + "&redirect_uri=http%3A%2F%2Fjs-kit.com%2Fapps%2Fjanrain%2Fwaiting.html&bp_channel=";
+
+      Backplane.init({
+        "serverBaseURL": CAPTURE.ECHO.options.serverBaseURL,
+        "busName": CAPTURE.ECHO.options.busName
+      });
+
       if (CAPTURE.ECHO.options.sso_check != null || CAPTURE.ECHO.options.sso_server != null) {
         CAPTURE.ECHO.options.sso_check = (CAPTURE.ECHO.options.sso_check != null)
           ? CAPTURE.ECHO.options.sso_check
-          : CAPTURE.ECHO.currentUrl + "?sso=check";
+          : CAPTURE.ECHO.currentUrl + "?sso=check&bp_channel=" + encodeURIComponent(Backplane.getChannelID());
         jQuery("body").append(jQuery("<iframe>", {
           css: {
             height: 0,
@@ -97,16 +104,6 @@ var CAPTURE = {
           src: CAPTURE.ECHO.options.sso_check
         }));
       }
-
-      CAPTURE.ECHO.options.captureUrl = "https://" + CAPTURE.ECHO.options.capture_addr
-        + "/oauth/signin?response_type=code&flags=stay_in_window&client_id="
-        + CAPTURE.ECHO.options.capture_client_id + "&xd_receiver=" + CAPTURE.ECHO.options.xd_receiver
-        + "&redirect_uri=http%3A%2F%2Fjs-kit.com%2Fapps%2Fjanrain%2Fwaiting.html&bp_channel=";
-
-      Backplane.init({
-        "serverBaseURL": CAPTURE.ECHO.options.serverBaseURL,
-        "busName": CAPTURE.ECHO.options.busName
-      });
 
       jQuery(".ecComments").each(CAPTURE.ECHO.comments);
     },
