@@ -27,7 +27,7 @@ var CAPTURE = {
       if (this.gup("xdcomm") == "true") {
         this.xdcommInit();
       } else if (this.gup("sso") == "check") {
-        this.ssoCheck(false);
+        this.ssoCheck();
       } else {
         this.loadEchoJs();
       }
@@ -45,19 +45,19 @@ var CAPTURE = {
       jQuery.getScript(jsHost + 'janraincapture.com/js/lib/xdcomm.js');
     },
     
-    ssoCheck: function(loaded=true) {
-      if (loaded===true) {
-        this.setOptions();
-        JANRAIN.SSO.CAPTURE.check_login({
-            sso_server: "https://" + CAPTURE.ECHO.options.sso_server,
-            client_id: CAPTURE.ECHO.options.capture_client_id,
-            redirect_uri: CAPTURE.ECHO.options.xd_receiver + "#parent;CAPTURE.ECHO.bpExpect:",
-            xd_receiver: CAPTURE.ECHO.options.xd_receiver,
-            bp_channel: Backplane.getChannelID()
-        });
-      } else {
-        jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", this.ssoCheck);
-      }
+    ssoCheck: function() {
+      jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", this.ssoCheck_callback);
+    },
+
+    ssoCheck_callback: function() {
+      this.setOptions();
+      JANRAIN.SSO.CAPTURE.check_login({
+          sso_server: "https://" + CAPTURE.ECHO.options.sso_server,
+          client_id: CAPTURE.ECHO.options.capture_client_id,
+          redirect_uri: CAPTURE.ECHO.options.xd_receiver + "#parent;CAPTURE.ECHO.bpExpect:",
+          xd_receiver: CAPTURE.ECHO.options.xd_receiver,
+          bp_channel: Backplane.getChannelID()
+      });
     },
 
     bpExpect: function() {
