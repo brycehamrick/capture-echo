@@ -6,7 +6,9 @@ var CAPTURE = {
       capture_width: 666,
       capture_height: 666,
       xd_receiver: null,
-      rpx_app_id: null
+      rpx_app_id: null,
+      sso_check: null,
+      sso_server: null
     },
     scripts: [
       "http://cdn.echoenabled.com/clientapps/v2/backplane.js",
@@ -24,6 +26,8 @@ var CAPTURE = {
       this.options = options;
       if (this.gup("xdcomm") == "true") {
         this.xdcommInit();
+      } else if (this.gup("sso") == "check") {
+        this.ssoCheck(false);
       } else {
         this.loadEchoJs();
       }
@@ -40,17 +44,43 @@ var CAPTURE = {
       var jsHost = (("https:" == document.location.protocol) ? "https://" : "http://static.");
       jQuery.getScript(jsHost + 'janraincapture.com/js/lib/xdcomm.js');
     },
+    
+    ssoCheck: function(loaded=true) {
+      if (loaded===true) {
+        this.setOptions();
+        JANRAIN.SSO.CAPTURE.check_login({
+            sso_server: "https://" + CAPTURE.ECHO.options.sso_server,
+            client_id: CAPTURE.ECHO.options.capture_client_id,
+            redirect_uri: CAPTURE.ECHO.options.xd_receiver + "#parent;CAPTURE.ECHO.bpExpect:",
+            xd_receiver: CAPTURE.ECHO.options.xd_receiver,
+            bp_channel: Backplane.getChannelID()
+        });
+      } else {
+        jQuery.getScript("https://" + CAPTURE.ECHO.options.sso_server + "/sso.js", this.ssoCheck);
+      }
+    },
+
+    bpExpect: function() {
+      Backplane.expectMessagesWithin(60, ["identity/ack"]);
+      jQuery("#ssoCheck").remove();
+    },
 
     mainInit: function() {
-      CAPTURE.ECHO.options = jQuery.extend(CAPTURE.ECHO.defaults, CAPTURE.ECHO.options);
-
-      CAPTURE.ECHO.currentUrl = window.location.href;
-      CAPTURE.ECHO.currentUrl = CAPTURE.ECHO.currentUrl.replace(/\#.+/, '').replace(/\?.+/, '');
-
-      CAPTURE.ECHO.options.xd_receiver = (CAPTURE.ECHO.options.xd_receiver === null)
-        ? CAPTURE.ECHO.currentUrl + "?xdcomm=true"
-        : CAPTURE.ECHO.options.xd_receiver;
-      CAPTURE.ECHO.options.xd_receiver = encodeURIComponent(CAPTURE.ECHO.options.xd_receiver);
+      this.setOptions();
+      if (CAPTURE.ECHO.options.sso_check != null || CAPTURE.ECHO.options.sso_server != null) {
+        CAPTURE.ECHO.options.sso_check = (CAPTURE.ECHO.options.sso_check != null)
+          ? CAPTURE.ECHO.options.sso_check
+          : CAPTURE.ECHO.currentUrl + "?sso=check&sso_server=" + CAPTURE.ECHO.options.sso_server;
+        jQuery("body").append("<iframe>", {
+          css: {
+            height: 0;
+            width: 0;
+            visibility: "hidden"
+          },
+          id: "ssoCheck",
+          src: CAPTURE.ECHO.options.sso_check
+        });
+      }
 
       CAPTURE.ECHO.options.captureUrl = "https://" + CAPTURE.ECHO.options.capture_addr
         + "/oauth/signin?response_type=code&flags=stay_in_window&client_id="
@@ -63,6 +93,18 @@ var CAPTURE = {
       });
 
       jQuery(".ecComments").each(CAPTURE.ECHO.comments);
+    },
+
+    setOptions: function() {
+      CAPTURE.ECHO.options = jQuery.extend(CAPTURE.ECHO.defaults, CAPTURE.ECHO.options);
+
+      CAPTURE.ECHO.currentUrl = window.location.href;
+      CAPTURE.ECHO.currentUrl = CAPTURE.ECHO.currentUrl.replace(/\#.+/, '').replace(/\?.+/, '');
+
+      CAPTURE.ECHO.options.xd_receiver = (CAPTURE.ECHO.options.xd_receiver === null)
+        ? CAPTURE.ECHO.currentUrl + "?xdcomm=true"
+        : CAPTURE.ECHO.options.xd_receiver;
+      CAPTURE.ECHO.options.xd_receiver = encodeURIComponent(CAPTURE.ECHO.options.xd_receiver);
     },
 
     comments: function(index, elem) {
