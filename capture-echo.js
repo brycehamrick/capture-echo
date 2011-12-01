@@ -73,8 +73,8 @@ var CAPTURE = {
           : CAPTURE.ECHO.currentUrl + "?sso=check&sso_server=" + CAPTURE.ECHO.options.sso_server;
         jQuery("body").append("<iframe>", {
           css: {
-            height: 0;
-            width: 0;
+            height: 0,
+            width: 0,
             visibility: "hidden"
           },
           id: "ssoCheck",
