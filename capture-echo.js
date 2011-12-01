@@ -63,7 +63,7 @@ var CAPTURE = {
 
     ssoCheckBP: function() {
       jQuery.getScript("http://cdn.echoenabled.com/clientapps/v2/backplane.js", this.ssoCheck_callback);
-    }
+    },
 
     ssoCheck_callback: function() {
       CAPTURE.ECHO.setOptions();
