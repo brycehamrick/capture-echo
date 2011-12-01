@@ -82,7 +82,7 @@ var CAPTURE = {
       if (CAPTURE.ECHO.options.sso_check != null || CAPTURE.ECHO.options.sso_server != null) {
         CAPTURE.ECHO.options.sso_check = (CAPTURE.ECHO.options.sso_check != null)
           ? CAPTURE.ECHO.options.sso_check
-          : CAPTURE.ECHO.currentUrl + "?sso=check;
+          : CAPTURE.ECHO.currentUrl + "?sso=check";
         jQuery("body").append(jQuery("<iframe>", {
           css: {
             height: 0,
